@@ -5,8 +5,6 @@ import io.restassured.response.Response;
 import net.serenitybdd.rest.SerenityRest;
 import net.thucydides.core.annotations.Step;
 
-import java.util.List;
-
 import static io.restassured.RestAssured.given;
 import static net.serenitybdd.rest.SerenityRest.restAssuredThat;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -15,6 +13,7 @@ public class OrdenStep {
 
     private static final String BASE_URL = "https://petstore.swagger.io/v2";
     private static final String ENDPOINT_ORDEN = "/store/order";
+    private String url = "";
     private Response response;
 
     @Step("Definir la URL base")
@@ -22,15 +21,13 @@ public class OrdenStep {
         SerenityRest.setDefaultBasePath(url);
     }
 
-    @Step("Enviar una orden con JSON")
+    @Step("Crear una orden con JSON")
     public void crearOrdenConJson(String body) {
         response = SerenityRest.given()
                 .contentType("application/json")
                 .body(body)
-                .log().all()
-                .post(BASE_URL + ENDPOINT_ORDEN)
+                .post(BASE_URL + "/store/order")
                 .then()
-                .log().all()
                 .extract()
                 .response();
     }
@@ -40,31 +37,25 @@ public class OrdenStep {
         restAssuredThat(response -> response.statusCode(codigo));
     }
 
-    @Step("Validar el campo status con valor {0}")
-    public void validarCampoStatus(String statusEsperado) {
-        restAssuredThat(response -> response.body("status", equalTo(statusEsperado)));
-    }
-
-    public void consultarOrden() {
-        response = given()
+    public void consultarOrden(String orderId) {
+        response = SerenityRest.given()
                 .contentType("application/json")
                 .log().all()
-                .get(BASE_URL + ENDPOINT_ORDEN);
+                .get(BASE_URL + ENDPOINT_ORDEN + "/" + orderId)
+                .then()
+                .log().all()
+                .extract()
+                .response();
     }
 
-    public void imprimirOrden() {
-        if (response.getContentType().contains("application/json")) {
-            Orden orden = response.as(Orden.class);
-            System.out.println("Orden ID: " + orden.getId());
-            System.out.println("Pet ID: " + orden.getPetId());
-            System.out.println("Cantidad: " + orden.getQuantity());
-            System.out.println("Fecha: " + orden.getFecha());
-            System.out.println("Status: " + orden.getStatus());
-            System.out.println("Completa: " + orden.isComplete());
-        } else {
-            System.out.println("La respuesta no contiene JSON válido.");
-        }
+
+    @Step("Validar campo {0} en el body")
+    public void validarCampoBody(String campo, String valorEsperado) {
+        String actual = response.jsonPath().getString(campo);
+        actual = actual.replaceAll("[<>]", "");
+        org.hamcrest.MatcherAssert.assertThat("El valor del campo no coincide", actual, equalTo(valorEsperado));
     }
+
 
 
 }

@@ -15,51 +15,33 @@ public class OrdenStepDef {
         ordenStep.definirURL("https://petstore.swagger.io/v2");
     }
 
-    @When("envío la siguiente información en el cuerpo de la solicitud")
-    public void envíoLaSiguienteInformaciónEnElCuerpoDeLaSolicitud(String cuerpoSolicitud) {
-        System.out.println("Cuerpo de la solicitud: " + cuerpoSolicitud);
-
-        String body = cuerpoSolicitud
-                .replace("<id>", "1")
-                .replace("<petId>", "1")
-                .replace("<quantity>", "2")
-                .replace("<shipDate>", "2024-12-17")
-                .replace("<status>", "placed")
-                .replace("<complete>", "true");
-
-        ordenStep.crearOrdenConJson(body);
+    @When("envio la siguiente informacion en el cuerpo de la solicitud")
+    public void envioLaSiguienteInformacionEnElCuerpoDeLaSolicitud(String cuerpoSolicitud) {
+        ordenStep.crearOrdenConJson(cuerpoSolicitud);
     }
 
-    @Then("la orden se crea exitosamente")
-    public void laOrdenSeCreaExitosamente() {
-        System.out.println("Orden creada exitosamente.");
+    @Then("la orden se crea exitosamente {int}")
+    public void laOrdenSeCreaExitosamente(int codigo) {
+        ordenStep.validarCodigoRespuesta(codigo);
     }
 
     @And("el campo {string} en la respuesta es {string}")
     public void elCampoEnLaRespuestaEs(String campo, String valorEsperado) {
-        if ("status".equals(campo)) {
-            ordenStep.validarCampoStatus(valorEsperado);
-        }
+        ordenStep.validarCampoBody(campo, valorEsperado.replaceAll("[<>]", ""));
     }
 
-    @And("el código de respuesta es {int}")
+    @And("el codigo de respuesta es {int}")
     public void elCódigoDeRespuestaEs(int codigo) {
         ordenStep.validarCodigoRespuesta(codigo);
     }
 
-    @Given("la url www.petstore.swagger.io con el path de la orden {string}")
+    /*@Given("la url www.petstore.swagger.io con el path de la orden {string}")
     public void laUrlConPathDeOrden(String orderId) {
         ordenStep.definirURL("https://petstore.swagger.io/v2/store/order/" + orderId);
-    }
+    }*/
 
-    @When("hago la consulta de la orden")
-    public void hagoLaConsultaDeLaOrden() {
-        ordenStep.consultarOrden();
+    @When("hago la consulta de la orden {string}")
+    public void hagoLaConsultaDeLaOrden(String ordenId) {
+        ordenStep.consultarOrden(ordenId);
     }
-
-    @Then("imprimo la orden")
-    public void imprimoLaOrden() {
-        ordenStep.imprimirOrden();
-    }
-
 }
