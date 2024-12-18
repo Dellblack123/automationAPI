@@ -24,8 +24,14 @@ Feature: Creación de órdenes en la API de Petstore
       | 2 | 2 | 2        | 2024-12-17   | shipped | false    | 200    |
 
 
-  @consultaArticulos2
-  Scenario: Consulta un servicio
-    Given la url "https://jsonplaceholder.typicode.com" del servicio
-    When hago la consulta de los articulos
-    Then imprimo los articulos
+  @consultarOrden
+  Scenario Outline: Consultar una orden específica por ID
+    Given la url www.petstore.swagger.io con el path de la orden "<orderId>"
+    When hago la consulta de la orden
+    Then imprimo la orden
+
+    Examples:
+      | orderId |
+      | 1       |
+      | 2       |
+      | 3       |

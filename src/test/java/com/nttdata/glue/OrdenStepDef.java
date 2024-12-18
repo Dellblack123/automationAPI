@@ -32,7 +32,6 @@ public class OrdenStepDef {
 
     @Then("la orden se crea exitosamente")
     public void laOrdenSeCreaExitosamente() {
-        // Este paso no necesita validación adicional aquí si solo se refiere al código de éxito
         System.out.println("Orden creada exitosamente.");
     }
 
@@ -47,4 +46,20 @@ public class OrdenStepDef {
     public void elCódigoDeRespuestaEs(int codigo) {
         ordenStep.validarCodigoRespuesta(codigo);
     }
+
+    @Given("la url www.petstore.swagger.io con el path de la orden {string}")
+    public void laUrlConPathDeOrden(String orderId) {
+        ordenStep.definirURL("https://petstore.swagger.io/v2/store/order/" + orderId);
+    }
+
+    @When("hago la consulta de la orden")
+    public void hagoLaConsultaDeLaOrden() {
+        ordenStep.consultarOrden();
+    }
+
+    @Then("imprimo la orden")
+    public void imprimoLaOrden() {
+        ordenStep.imprimirOrden();
+    }
+
 }
